@@ -1,0 +1,13 @@
+# API-sleutel nooit mee publiceren
+gemini_key.txt
+*.key
+
+# originele prenten (groot); de site gebruikt de lichte versies in beelden/
+IMG/
+
+# werkbestanden
+generatie_log.csv
+_contact.jpg
+__pycache__/
+.DS_Store
+netlify/
