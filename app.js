@@ -497,6 +497,45 @@
     }
   }
 
+  // Kaartjes zo groot mogelijk maken binnen het scherm, zonder scrollen (digitaal bord).
+  // Probeert elk aantal kolommen en kiest de schikking met de breedste kaartjes die nog passen.
+  function pasKaartjesAan() {
+    const grid = document.querySelector('#inhoud .kaarten');
+    if (!grid) return;
+    grid.classList.remove('passend'); grid.style.cssText = '';
+    const box = $('#inhoud');
+    const W = box.clientWidth, H = box.clientHeight;
+    const kaarten = [...grid.children], n = kaarten.length;
+    if (!n || W < 50 || H < 50) return;
+    const gap = Math.round(Math.max(12, Math.min(30, W * 0.014)));
+    const pad = 12, binnen = 10;
+    const ratio = grid.querySelector('.vorm-picto') ? 3 / 4 : 9 / 16;
+    const woorden = kaarten.map(k => (k.querySelector('.kaart-woord') || {}).textContent || '');
+    const letter = w => Math.max(18, Math.min(48, w * 0.085));
+    const lijnen = (w, fs) => Math.min(3, Math.max(1, ...woorden.map(t => Math.ceil(t.trim().length * fs * 0.56 / (w - 2 * pad - 20)))));
+    let best = null;
+    for (let cols = 1; cols <= n; cols++) {
+      const rows = Math.ceil(n / cols);
+      const wBreed = (W - gap * (cols - 1)) / cols;
+      let w = wBreed;
+      for (let i = 0; i < 4; i++) {                       // label-hoogte hangt af van de breedte: even bijsturen
+        const fs = letter(w);
+        const labelH = lijnen(w, fs) * fs * 1.18 + 16;
+        const wHoog = ((H - gap * (rows - 1)) / rows - 2 * pad - binnen - labelH) / ratio + 2 * pad;
+        w = Math.min(wBreed, wHoog);
+      }
+      if (!best || w > best.w + 0.5) best = { cols, w };
+    }
+    if (best.w < 140) return;                              // te klein (bv. gsm met veel kaartjes): gewoon scrollen
+    const w = Math.floor(best.w);
+    grid.classList.add('passend');
+    grid.style.gridTemplateColumns = `repeat(${best.cols}, ${w}px)`;
+    grid.style.gap = gap + 'px';
+    grid.style.setProperty('--fs', letter(w).toFixed(1) + 'px');
+  }
+  let pasTimer;
+  window.addEventListener('resize', () => { clearTimeout(pasTimer); pasTimer = setTimeout(pasKaartjesAan, 80); });
+
   function render(spreekVraag) {
     const stap = huidigeStap();
     document.body.dataset.stap = stap;
@@ -520,6 +559,7 @@
       stemKlaarzetten();
     } else {
       inhoud.innerHTML = kaartjesHTML(stap, opties(stap));
+      requestAnimationFrame(pasKaartjesAan);
       if (spreekVraag && !voorStart) lees([stukVast(vraagId(stap))], true);
     }
     inhoud.className = 'inhoud-' + stap;

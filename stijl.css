@@ -331,3 +331,12 @@ body::before { opacity: .5; }
   .kaart-woord { font-size: 20px; }
   .kaarten-cat .kaart-woord { font-size: 22px; }
 }
+
+/* ---------- kaartjes passend op het scherm (berekend in app.js) ---------- */
+#inhoud { min-height: 0; overflow: hidden; }
+.kaarten.passend {
+  width: auto; max-width: none; max-height: none; overflow: visible; margin: 0;
+  justify-content: center; align-content: center; padding: 0;
+}
+.kaarten.passend .kaart-woord { font-size: var(--fs); }
+.kaarten:not(.passend) { max-height: 100%; overflow-y: auto; }
