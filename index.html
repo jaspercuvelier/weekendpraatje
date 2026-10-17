@@ -8,13 +8,16 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icoon-192.png">
 <meta name="theme-color" content="#ffffff">
-<meta name="description" content="Vertel over je weekend met kleuren en prenten.">
+<meta name="description" content="Vertel over je weekend met kleuren en Sclera-picto's.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stijl.css">
+<link rel="stylesheet" href="sclera/sclera.css">
+<!-- Standaardversie met Sclera-picto's. De versie met prenten staat in beta/. -->
+<script>window.WEEKEND = { basis: '', beelden: 'sclera/picto/', ext: '.png', vorm: 'sclera' };</script>
 </head>
-<body>
+<body class="sclera">
 <header class="balk">
   <button id="terug" class="knop-rond" aria-label="terug"></button>
   <img class="logo" src="assets/logo-styrka.png" alt="Styrka Secundair Onderwijs @waterkant">
@@ -44,9 +47,10 @@
 
 <nav id="blok" class="blok" aria-label="vaste antwoorden"></nav>
 <div id="overlay" class="overlay" hidden></div>
+<a class="bron" href="https://www.sclera.be" target="_blank" rel="noopener">Picto's: Sclera vzw · CC BY-NC</a>
 
 <script src="inhoud.js"></script>
-<script src="beelden/lijst.js"></script>
+<script src="sclera/picto/lijst.js"></script>
 <script src="audio/lijst.js"></script>
 <script src="spraak/spraak.js"></script>
 <script src="app.js"></script>

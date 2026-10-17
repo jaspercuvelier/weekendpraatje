@@ -10,7 +10,7 @@ from pathlib import Path
 BASIS = Path(__file__).resolve().parent
 DOEL = BASIS / "netlify"
 BESTANDEN = ["index.html", "app.js", "stijl.css", "inhoud.js", "sw.js", "manifest.webmanifest"]
-MAPPEN = ["beelden", "audio", "assets", "spraak", "sclera"]
+MAPPEN = ["beelden", "audio", "assets", "spraak", "sclera", "beta"]
 
 if DOEL.exists():
     shutil.rmtree(DOEL)

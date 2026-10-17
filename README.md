@@ -69,11 +69,15 @@ Installeren is niet nodig. Na het typen verschijnt bovenaan wel een tip om de si
 Wijzig je iets aan de app, dan komt dat door bij de volgende start met internet.
 Werkt enkel via http(s) (GitHub Pages, Netlify of `dev_server.py`), niet bij dubbelklikken op `index.html`.
 
-## Sclera-versie (map `sclera/`)
+## Twee versies
 
-Dezelfde app, maar met de pictogrammen van [Sclera](https://www.sclera.be) in plaats van de prenten:
-open `sclera/` (lokaal http://localhost:8000/sclera/, online …/sclera/).
-Inhoud, zinnen, stemmen en code komen uit de hoofdmap; enkel de picto's verschillen.
+- **Standaard (hoofdpagina): Sclera-picto's.** Lokaal http://localhost:8000/, online https://weekendpraatje.cuveldier.com/
+- **Beta (`beta/`): de prenten** uit `beelden/`. Lokaal http://localhost:8000/beta/, online …/beta/
+
+Inhoud, zinnen, stemmen en code zijn gedeeld; enkel de beelden verschillen (instelling `window.WEEKEND` in elke `index.html`).
+Het oude adres `/sclera/` stuurt door naar de hoofdpagina.
+
+### Sclera-picto's kiezen
 
 ```bash
 python3 maak_sclera.py              # sclera/picto/ opnieuw opbouwen uit Sclera_picto_nl/
@@ -87,6 +91,6 @@ De picto's vallen onder de licentie CC BY-NC 2.0 BE (naamsvermelding, niet-comme
 ## Testen en uploaden
 
 ```bash
-python3 dev_server.py         # lokaal testen op http://localhost:8000 (zonder cache)
+python3 dev_server.py         # lokaal testen: http://localhost:8000 (Sclera) en /beta/ (prenten), zonder cache
 python3 maak_uploadmap.py     # map netlify/ opnieuw opbouwen; sleep die naar https://app.netlify.com/drop
 ```

@@ -5,10 +5,10 @@
  * - stemmodellen en spraakmotor (groot): één keer downloaden, daarna altijd van het toestel
  * Werkt in een gewone browser; installeren als app is niet nodig (wel handig). */
 'use strict';
-const VERSIE = 'weekend-3';          // ophogen als je zeker wil dat alles opnieuw opgehaald wordt
+const VERSIE = 'weekend-4';          // ophogen als je zeker wil dat alles opnieuw opgehaald wordt
 const GROOT_CACHE = 'weekend-groot';  // stemmodellen en spraakmotor: blijven bewaard over versies heen
 const KERN = [
-  './', 'index.html', 'stijl.css', 'app.js', 'inhoud.js', 'beelden/lijst.js', 'audio/lijst.js',
+  './', 'index.html', 'stijl.css', 'app.js', 'inhoud.js', 'sclera/sclera.css', 'sclera/picto/lijst.js', 'audio/lijst.js',
   'spraak/spraak.js', 'manifest.webmanifest', 'assets/logo-styrka.png', 'assets/jouw-koers.png',
   'assets/icoon-192.png', 'assets/icoon-512.png', 'assets/achtergrond.svg'
 ];
@@ -31,12 +31,11 @@ self.addEventListener('activate', e => {
         const json = JSON.parse(t.slice(t.indexOf('=') + 1).trim().replace(/;$/, ''));
         return pad(json);
       };
-      const beelden = await lijst('beelden/lijst.js', a => a.map(id => `beelden/${id}.jpg`));
+      // standaard = Sclera-picto's; de prenten van beta/ worden pas bewaard wanneer ze gebruikt worden
+      const beelden = await lijst('sclera/picto/lijst.js', a => a.map(id => `sclera/picto/${id}.png`));
       const audio = await lijst('audio/lijst.js', o => Object.entries(o).flatMap(([s, ids]) => ids.map(id => `audio/${s}/${id}.mp3`)));
-      // Sclera-versie (map sclera/): ook die picto's bewaren, als de map er is
-      const sclera = await lijst('sclera/picto/lijst.js', a => a.map(id => `sclera/picto/${id}.png`)).catch(() => []);
       const ontbreekt = [];
-      for (const u of beelden.concat(audio, sclera)) if (!(await c.match(u))) ontbreekt.push(u);
+      for (const u of beelden.concat(audio)) if (!(await c.match(u))) ontbreekt.push(u);
       for (let i = 0; i < ontbreekt.length; i += 20) {
         await Promise.allSettled(ontbreekt.slice(i, i + 20).map(u => c.add(u)));
       }
@@ -53,7 +52,7 @@ async function eerstNet(req) {
     return r;
   } catch (e) {
     return (await c.match(req, { ignoreSearch: true }))
-      || (req.mode === 'navigate' ? await c.match(url.pathname.includes('/sclera/') ? 'sclera/index.html' : 'index.html') : null)
+      || (req.mode === 'navigate' ? await c.match(url.pathname.includes('/beta/') ? 'beta/index.html' : 'index.html') : null)
       || Response.error();
   }
 }

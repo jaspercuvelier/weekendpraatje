@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn weekend – prenten (beta)</title>
+<link rel="icon" href="../assets/icoon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../assets/icoon-192.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Vertel over je weekend met kleuren en prenten.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../stijl.css">
+<!-- Versie met de (AI-)prenten. Zelfde app als in de hoofdmap, enkel de beelden verschillen. -->
+<script>window.WEEKEND = { basis: '../', beelden: '../beelden/', ext: '.jpg', vorm: 'scene' };</script>
+</head>
+<body>
+<header class="balk">
+  <button id="terug" class="knop-rond" aria-label="terug"></button>
+  <img class="logo" src="../assets/logo-styrka.png" alt="Styrka Secundair Onderwijs @waterkant">
+  <ol id="spoor" class="spoor" aria-label="wat je al koos"></ol>
+  <img class="koers" src="../assets/jouw-koers.png" alt="Jouw koers, onze stroom">
+  <div class="leerkracht" aria-label="instellingen voor de leerkracht">
+    <button id="opnieuw" class="knop-klein" title="helemaal opnieuw beginnen" aria-label="helemaal opnieuw beginnen"></button>
+    <button id="confetti" class="knop-klein" title="confetti aan/uit" aria-label="confetti"></button>
+  </div>
+</header>
+
+<div id="installeer" class="installeer" hidden>
+  <button id="installeerKnop" class="installeer-knop">
+    <img src="../assets/icoon-192.png" alt="" width="32" height="32">
+    <span><b>Volgende keer sneller laden?</b> Klik hier om deze site als app te installeren.</span>
+  </button>
+  <button id="installeerSluit" class="installeer-sluit" aria-label="sluiten">×</button>
+</div>
+
+<main id="scherm">
+  <div class="kop">
+    <h1 id="vraag"></h1>
+    <button id="overslaan" class="overslaan" hidden>overslaan</button>
+  </div>
+  <div id="inhoud"></div>
+</main>
+
+<nav id="blok" class="blok" aria-label="vaste antwoorden"></nav>
+<div id="overlay" class="overlay" hidden></div>
+
+<script src="../inhoud.js"></script>
+<script src="../beelden/lijst.js"></script>
+<script src="../audio/lijst.js"></script>
+<script src="../spraak/spraak.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>
