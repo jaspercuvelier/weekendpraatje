@@ -229,7 +229,6 @@ window.INHOUD = {
       "scene": "a friendly signpost in a park with arrows pointing in different directions; one sign shows a big question mark",
       "groepen": [
         {"id": "weet-niet-meer", "woord": "ik weet het niet meer", "spreek": "Ik weet het niet meer.", "emoji": "🤔", "beeld": "g-weet-niet-meer", "scene": "an empty notebook lying open on a table, with a big question mark drawn on the empty page", "zin": "Jij weet het niet meer?", "lagen": false},
-        {"id": "vergeten", "woord": "ik ben het vergeten", "spreek": "Ik ben het vergeten.", "emoji": "🤔", "zin": "Jij bent het vergeten?", "lagen": false},
         {"id": "echt-iets-anders", "woord": "echt nog iets anders", "spreek": "Ik deed echt nog iets anders.", "emoji": "💬", "beeld": "anders", "typ": true},
         {
           "id": "wil-niet-vertellen",

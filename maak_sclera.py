@@ -22,13 +22,13 @@ KEUZE = {
     # start en stemmen
     "start-zelf": "vertellen", "start-voorlezen": "voorlezen", "stem-vrouw": "vrouw", "stem-man": "man",
     # kleuren
-    "cat-actief": "sport en spel", "cat-gezellig": "groep gezellig", "cat-chill": "relax", "cat-anders": "vraagteken",
+    "cat-actief": "sport en spel", "cat-gezellig": "groep gezellig", "cat-chill": "ligzetel liggen", "cat-anders": "vraagteken",
     # groepen
     "sporten": "sport", "g-spelen-actief": "spelen buiten", "uitstap": "uitstap",
     "g-creatief": "creatief met materiaal", "g-spelen-samen": "spelletje bezig meedoen", "feestje": "fuif",
     "g-apero-eten": "aperitief", "g-bezoek": "op bezoek",
     "g-schermtijd": "tv kijken", "rusten": "hangmat", "g-verzorging": "bad douche",
-    "g-weet-niet-meer": "nadenken", "vergeten": "nadenken 2", "anders": "anders", "g-wil-niet-vertellen": "zwijgen",
+    "g-weet-niet-meer": "nadenken", "anders": "anders", "g-wil-niet-vertellen": "zwijgen",
     # actief
     "basketbal": "basketball", "muurklimmen": "bergbeklimmen", "zwemmen": "zwemmen 4", "fietsen": "fietsen bos",
     "voetballen": "voetbal 3", "dansen": "dansen", "hockey": "hockey 2", "judo": "Oosterse sporten", "vissen": "vissen 2",
@@ -40,7 +40,7 @@ KEUZE = {
     "knutselen": "knutselen", "tekenen": "tekenen", "schilderen": "schilderen", "puzzelen": "puzzelen 2",
     "gezelschapsspel": "gezelschapsspel", "samen-spelen": "spelen binnen", "verjaardag": "Verjaardag",
     "bakken-koken": "koken ik", "aperitieven": "zoute snacks", "gaan-eten": "uit eten gaan", "thuis-eten": "maaltijd thuis",
-    "bezoek-krijgen": "bezoek van", "familie-bezoeken": "huis school grootouders",
+    "bezoek-krijgen": "bezoek van", "familie-bezoeken": "grootouders 2",
     "vrienden-bezoeken": "spelen ik bij vriendje 2",
     # chill
     "tv-film": "tv kijken 2", "tablet": "tablet computer", "gamen": "playstation", "muziek": "muziek luisteren",
@@ -52,7 +52,7 @@ KEUZE = {
     "wie-alleen": "spelen binnen alleen", "wie-mama": "moeder 2", "wie-papa": "vader 2", "wie-broer-zus": "liefde zus broer",
     "wie-familie": "familie", "wie-vriend": "vrienden 2", "wie-groep": "groep 3",
     # waar
-    "waar-thuis": "thuis 2", "waar-buiten": "buiten 2", "waar-familie": "huis school grootouders",
+    "waar-thuis": "thuis 2", "waar-buiten": "buiten 2", "waar-familie": "grootouders 2",
     "waar-winkel": "supermarkt", "waar-restaurant": "restaurant", "waar-frituur": "frietjes", "waar-sportclub": "sporthal",
     "waar-cafe": "café", "waar-anders": "waar",
     # wanneer (zaterdag en zondag: geen Sclera-picto, zie DAGEN)
