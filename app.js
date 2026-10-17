@@ -425,7 +425,7 @@
     const kleur = keuze.cat.kleur;
     return `<div class="ketting ${corrigeren ? 'corrigeren' : ''}">` + gekozen().map((g, j) => {
       const isCat = g.veld === 'cat';
-      const beeld = g.typ ? svgIcoon(ICOON.potlood, 'ico') : (isCat ? '' : beeldHTML(g.it));
+      const beeld = g.typ ? svgIcoon(ICOON.potlood, 'ico') : (isCat && !beeldSrc(g.it) ? '' : beeldHTML(g.it));
       return (j ? `<span class="schakel">${svgIcoon(ICOON.pijl)}</span>` : '') +
         `<button class="mini ${isCat ? 'mini-cat' : ''} ${keuze.cat.id === 'anders' ? 'licht' : ''}" data-veld="${g.veld}" style="--k:${kleur}">
           <span class="mini-beeld">${beeld}</span>
@@ -450,7 +450,7 @@
   function spoorHTML() {
     let h = `<li><button class="chip" data-veld="start">${esc(D.titel.replace(' …', ''))}</button></li>`;
     gekozen().forEach(g => {
-      const mini = g.typ ? svgIcoon(ICOON.potlood) : (g.veld === 'cat' ? '' : beeldHTML(g.it, true));
+      const mini = g.typ ? svgIcoon(ICOON.potlood) : (g.veld === 'cat' && !beeldSrc(g.it) ? '' : beeldHTML(g.it, true));
       h += `<li><button class="chip" data-veld="${g.veld}" style="--k:${keuze.cat.kleur}"><span class="chip-stip"></span>${mini ? `<span class="chip-beeld">${mini}</span>` : ''}${esc(g.woord)}</button></li>`;
     });
     return h;
