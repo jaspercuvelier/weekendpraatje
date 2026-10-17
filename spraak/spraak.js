@@ -12,7 +12,7 @@
   function start() {
     if (worker || kapot) return worker;
     try {
-      worker = new Worker('spraak/spraak-worker.js');
+      worker = new Worker(((window.WEEKEND && window.WEEKEND.basis) || '') + 'spraak/spraak-worker.js');
       worker.onmessage = e => { const w = wacht[e.data.nr]; if (w) { delete wacht[e.data.nr]; w(e.data); } };
       worker.onerror = e => { console.warn('[spraak]', e.message); kapot = true; Object.values(wacht).forEach(w => w({ ok: false, fout: 'worker' })); };
     } catch (e) { kapot = true; }

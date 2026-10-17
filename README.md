@@ -69,6 +69,21 @@ Installeren is niet nodig. Na het typen verschijnt bovenaan wel een tip om de si
 Wijzig je iets aan de app, dan komt dat door bij de volgende start met internet.
 Werkt enkel via http(s) (GitHub Pages, Netlify of `dev_server.py`), niet bij dubbelklikken op `index.html`.
 
+## Sclera-versie (map `sclera/`)
+
+Dezelfde app, maar met de pictogrammen van [Sclera](https://www.sclera.be) in plaats van de prenten:
+open `sclera/` (lokaal http://localhost:8000/sclera/, online …/sclera/).
+Inhoud, zinnen, stemmen en code komen uit de hoofdmap; enkel de picto's verschillen.
+
+```bash
+python3 maak_sclera.py              # sclera/picto/ opnieuw opbouwen uit Sclera_picto_nl/
+python3 maak_sclera.py --controle   # + contactblad sclera/_overzicht.jpg om de keuzes na te kijken
+```
+
+Een ander picto voor een kaartje? Pas de naam aan in `KEUZE` bovenaan `maak_sclera.py`.
+Sclera heeft geen picto voor zaterdag en zondag: die worden gemaakt van een scheurkalender met *ZA* en *ZO*.
+De picto's vallen onder de licentie CC BY-NC 2.0 BE (naamsvermelding, niet-commercieel); de vermelding staat op het startscherm.
+
 ## Testen en uploaden
 
 ```bash

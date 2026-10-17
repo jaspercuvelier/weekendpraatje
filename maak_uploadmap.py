@@ -10,7 +10,7 @@ from pathlib import Path
 BASIS = Path(__file__).resolve().parent
 DOEL = BASIS / "netlify"
 BESTANDEN = ["index.html", "app.js", "stijl.css", "inhoud.js", "sw.js", "manifest.webmanifest"]
-MAPPEN = ["beelden", "audio", "assets", "spraak"]
+MAPPEN = ["beelden", "audio", "assets", "spraak", "sclera"]
 
 if DOEL.exists():
     shutil.rmtree(DOEL)
@@ -28,7 +28,7 @@ for m in MAPPEN:
                 elif not f.name.endswith(".mp3"):
                     shutil.copy2(f, DOEL / m / f.name)
         else:
-            shutil.copytree(BASIS / m, DOEL / m)
+            shutil.copytree(BASIS / m, DOEL / m, ignore=shutil.ignore_patterns("_*"))
 n = sum(1 for p in DOEL.rglob("*") if p.is_file())
 mb = sum(p.stat().st_size for p in DOEL.rglob("*") if p.is_file()) / 1e6
 print(f"netlify/ klaar: {n} bestanden, {mb:.1f} MB")

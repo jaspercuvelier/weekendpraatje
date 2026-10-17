@@ -11,3 +11,7 @@ _contact.jpg
 __pycache__/
 .DS_Store
 netlify/
+
+# Sclera-bibliotheek (groot); de site gebruikt enkel sclera/picto/
+Sclera_picto_nl/
+sclera/_overzicht.jpg

@@ -1,6 +1,8 @@
 'use strict';
 (function () {
   const D = window.INHOUD;
+  // Instellingen per versie (bv. sclera/index.html): window.WEEKEND = { basis: '../', beelden: 'picto/', ext: '.png', vorm: 'sclera' }
+  const CFG = Object.assign({ basis: '', beelden: 'beelden/', ext: '.jpg', vorm: 'scene' }, window.WEEKEND || {});
   const Z = D.zinnen;
   const BEELDEN = new Set(window.BEELDEN || []);
   const AUDIO = window.AUDIO || {};               // { vrouw: [...ids], man: [...ids] }
@@ -39,7 +41,7 @@
   const svgIcoon = (inner, cls = '') =>
     `<svg viewBox="0 0 24 24" class="${cls}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
   const beeldId = it => it.beeld || (it.groepen ? 'cat-' + it.id : it.id);
-  const beeldSrc = it => BEELDEN.has(beeldId(it)) ? `beelden/${beeldId(it)}.jpg` : null;
+  const beeldSrc = it => BEELDEN.has(beeldId(it)) ? CFG.beelden + beeldId(it) + CFG.ext : null;
 
   // ---------- toestand ----------
   let modus = null;              // 'zelf' of 'voorlezen'
@@ -142,7 +144,7 @@
       speler.play().catch(reserve);
     };
     if (heeftAudio(st[0])) {
-      speel(`audio/${stem}/${st[0]}.mp3`, () => tts(st[1], verder));
+      speel(CFG.basis + `audio/${stem}/${st[0]}.mp3`, () => tts(st[1], verder));
     } else if (!st[0] && window.Spraak && !window.Spraak.kapot) {
       // zelf getypte tekst: met dezelfde Vlaamse stem, ter plaatse gemaakt (spraak/spraak.js)
       window.Spraak.maak(st[1], stem)
@@ -388,7 +390,7 @@
       items.map((it, i) => {
         const kleur = tint(i);
         const ditLicht = licht || (stap === 'cat' && it.id === 'anders');
-        const vorm = beeldSrc(it) || !ICOON[it.id] ? 'scene' : 'picto';
+        const vorm = beeldSrc(it) || !ICOON[it.id] ? CFG.vorm : 'picto';
         return `<button class="kaart ${stap === 'cat' ? 'kaart-cat' : ''} ${ditLicht ? 'licht' : ''}"
             data-i="${i}" style="--k:${kleur}" aria-label="${esc(it.woord)}">
           <span class="kaart-beeld vorm-${vorm}">${beeldHTML(it)}</span>
@@ -509,7 +511,7 @@
     if (!n || W < 50 || H < 50) return;
     const gap = Math.round(Math.max(12, Math.min(30, W * 0.014)));
     const pad = 12, binnen = 10;
-    const ratio = grid.querySelector('.vorm-picto') ? 3 / 4 : 9 / 16;
+    const ratio = grid.querySelector('.vorm-sclera') ? 1 : grid.querySelector('.vorm-picto') ? 3 / 4 : 9 / 16;
     const woorden = kaarten.map(k => (k.querySelector('.kaart-woord') || {}).textContent || '');
     const letter = w => Math.max(18, Math.min(48, w * 0.085));
     const lijnen = (w, fs) => Math.min(3, Math.max(1, ...woorden.map(t => Math.ceil(t.trim().length * fs * 0.56 / (w - 2 * pad - 20)))));
@@ -621,7 +623,7 @@
   $('#installeerSluit').addEventListener('click', () => { tipGesloten = true; $('#installeer').hidden = true; });
   // service worker: bewaart de app op het toestel (werkt ook zonder te installeren)
   if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.warn('[sw]', e)));
+    window.addEventListener('load', () => navigator.serviceWorker.register(CFG.basis + 'sw.js').catch(e => console.warn('[sw]', e)));
   }
 
   // voor testen: window.__weekend

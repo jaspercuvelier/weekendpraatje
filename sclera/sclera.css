@@ -1,0 +1,15 @@
+/* Sclera-versie: vierkante picto's (wit op zwart) in plaats van de 16:9-prenten. */
+.kaart-beeld.vorm-sclera { aspect-ratio: 1; background: #000; border-radius: 12px; }
+.kaart-beeld.vorm-sclera img { object-fit: cover; }
+.sclera .mini-beeld { aspect-ratio: 1; }
+.sclera .mini { width: 130px; }
+.sclera .mini-beeld:has(img) { background: #000; }
+.sclera .blok-beeld img { border-radius: 6px; }
+.sclera .groot-kaart .blok-beeld img { border-radius: 14px; }
+/* bronvermelding (licentie Sclera: naamsvermelding verplicht) */
+.bron {
+  position: fixed; right: 8px; bottom: calc(env(safe-area-inset-bottom) + 2px); z-index: 5;
+  font-size: 11px; color: var(--zacht); text-decoration: none; opacity: .75;
+}
+/* enkel tonen op het startscherm, waar het vaste blok onderaan er niet is */
+body:not([data-stap="start"]):not([data-stap="stem"]) .bron { display: none; }
