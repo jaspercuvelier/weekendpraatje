@@ -5,10 +5,10 @@
  * - stemmodellen en spraakmotor (groot): één keer downloaden, daarna altijd van het toestel
  * Werkt in een gewone browser; installeren als app is niet nodig (wel handig). */
 'use strict';
-const VERSIE = 'weekend-4';          // ophogen als je zeker wil dat alles opnieuw opgehaald wordt
+const VERSIE = 'weekend-5';          // ophogen als je zeker wil dat alles opnieuw opgehaald wordt
 const GROOT_CACHE = 'weekend-groot';  // stemmodellen en spraakmotor: blijven bewaard over versies heen
 const KERN = [
-  './', 'index.html', 'stijl.css', 'app.js', 'inhoud.js', 'sclera/sclera.css', 'sclera/picto/lijst.js', 'audio/lijst.js',
+  './', 'index.html', 'stijl.css', 'app.js', 'inhoud.js', 'inhoud-nieuw.js', 'sclera/sclera.css', 'sclera/picto/lijst.js', 'audio/lijst.js',
   'spraak/spraak.js', 'manifest.webmanifest', 'assets/logo-styrka.png', 'assets/jouw-koers.png',
   'assets/icoon-192.png', 'assets/icoon-512.png', 'assets/achtergrond.svg'
 ];

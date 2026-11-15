@@ -62,6 +62,14 @@ KEUZE = {
     # ja / nee / weet ik niet
     "waarweet-ja": "ja knikken", "waarweet-nee": "nee schudden",
     "blok-ja": "ja knikken", "blok-nee": "nee schudden", "blok-weet": "vraagteken",
+    # nieuwe indeling (inhoud-nieuw.js); de andere kaartjes daar gebruiken bestaande picto's via "beeld"
+    "cat-thuis": "thuis 2", "cat-leefgroep": "leefgroep", "cat-niet-thuis": "buiten gaan", "cat-niks": "zwijgen",
+    "binnen": "binnen", "buiten": "buiten", "bal": "bal overspelen", "vergeten": "nadenken 2",
+    "eten-leefgroep": "eten samen", "helpen-opvoeders": "huishouden",
+    "ziekenhuis": "ziekenhuis", "dokter": "dokter", "tandarts": "tandarts",
+    "wie-opvoeders": "begeleider 5", "wie-vrienden-lg": "vrienden 6",
+    "waar-thuis-binnen": "binnen", "waar-thuis-buiten": "buiten", "waar-leefgroep": "leefgroep",
+    "waar-jeugdbeweging": "jeugdbeweging", "wann-vakantie": "schoolvakantie zomer",
 }
 # Sclera heeft geen picto per weekdag: scheurkalender met de dag erop.
 DAGEN = {"wann-zaterdag": ("scheurkalender dag", "ZA"), "wann-zondag": ("scheurkalender dag", "ZO")}

@@ -26,6 +26,14 @@
   <div class="leerkracht" aria-label="instellingen voor de leerkracht">
     <button id="opnieuw" class="knop-klein" title="helemaal opnieuw beginnen" aria-label="helemaal opnieuw beginnen"></button>
     <button id="confetti" class="knop-klein" title="confetti aan/uit" aria-label="confetti"></button>
+    <button id="instellingen" class="knop-klein" title="instellingen" aria-label="instellingen" aria-expanded="false" aria-controls="instPaneel"></button>
+  </div>
+  <div id="instPaneel" class="inst-paneel" role="dialog" aria-label="instellingen" hidden>
+    <label class="schakel">
+      <input type="checkbox" id="nieuwSchakel">
+      <span class="schakel-baan" aria-hidden="true"></span>
+      <span class="schakel-tekst"><b>Nieuwe indeling</b><small>Eerst: thuis · leefgroep · niet thuis · niks vertellen. Uit = de huidige versie. Wordt onthouden op dit toestel.</small></span>
+    </label>
   </div>
 </header>
 
@@ -50,6 +58,7 @@
 <a class="bron" href="https://www.sclera.be" target="_blank" rel="noopener">Picto's: Sclera vzw · CC BY-NC</a>
 
 <script src="inhoud.js"></script>
+<script src="inhoud-nieuw.js"></script>
 <script src="sclera/picto/lijst.js"></script>
 <script src="audio/lijst.js"></script>
 <script src="spraak/spraak.js"></script>

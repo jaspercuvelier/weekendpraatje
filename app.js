@@ -1,19 +1,29 @@
 'use strict';
 (function () {
-  const D = window.INHOUD;
-  // Instellingen per versie (bv. sclera/index.html): window.WEEKEND = { basis: '../', beelden: 'picto/', ext: '.png', vorm: 'sclera' }
-  const CFG = Object.assign({ basis: '', beelden: 'beelden/', ext: '.jpg', vorm: 'scene' }, window.WEEKEND || {});
-  const Z = D.zinnen;
-  const BEELDEN = new Set(window.BEELDEN || []);
-  const AUDIO = window.AUDIO || {};               // { vrouw: [...ids], man: [...ids] }
-  const LAGEN = D.lagen.map(l => l.id);           // wie, waar, wanneer, hoe
-  const $ = s => document.querySelector(s);
-
   // ---------- kleine hulpjes ----------
   const opslag = {
     get(k, d) { try { const v = localStorage.getItem('weekend_' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('weekend_' + k, JSON.stringify(v)); } catch (e) { /* geen opslag: geen probleem */ } }
   };
+
+  // Twee indelingen: de huidige (inhoud.js) en de nieuwe (inhoud-nieuw.js, aan/uit in de instellingen, wordt onthouden).
+  // De nieuwe vervangt de kleuren en lagen; al de rest komt uit inhoud.js.
+  const OUD = window.INHOUD, NIEUW = window.INHOUD_NIEUW;
+  let nieuweVersie = !!NIEUW && opslag.get('nieuw', false);
+  let D, Z, LAGEN;
+  function laadInhoud() {
+    D = nieuweVersie
+      ? Object.assign({}, OUD, NIEUW, { zinnen: Object.assign({}, OUD.zinnen, NIEUW.zinnen) })
+      : OUD;
+    Z = D.zinnen;
+    LAGEN = D.lagen.map(l => l.id);               // wie, waar, wanneer, hoe
+  }
+  laadInhoud();
+  // Instellingen per versie (bv. beta/index.html): window.WEEKEND = { basis: '../', beelden: '../beelden/', ext: '.jpg', vorm: 'scene' }
+  const CFG = Object.assign({ basis: '', beelden: 'beelden/', ext: '.jpg', vorm: 'scene' }, window.WEEKEND || {});
+  const BEELDEN = new Set(window.BEELDEN || []);
+  const AUDIO = window.AUDIO || {};               // { vrouw: [...ids], man: [...ids] }
+  const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   function meng(hex, wit) {
     const n = parseInt(hex.slice(1), 16), rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -36,37 +46,56 @@
     'hoe-super': `<g transform="translate(0 5) scale(.52)">${DUIM}</g><g transform="translate(11.5 5) scale(.52)">${DUIM}</g>`,
     'hoe-leuk': DUIM,
     'hoe-gewoon': `<g transform="rotate(-90 12 12)">${DUIM}</g>`,
-    'hoe-niet': `<g transform="matrix(1 0 0 -1 0 24)">${DUIM}</g>`
+    'hoe-niet': `<g transform="matrix(1 0 0 -1 0 24)">${DUIM}</g>`,
+    tandwiel: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'
   };
   const svgIcoon = (inner, cls = '') =>
     `<svg viewBox="0 0 24 24" class="${cls}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
-  const beeldId = it => it.beeld || (it.groepen ? 'cat-' + it.id : it.id);
+  const beeldId = it => it.beeld || (D.categorieen.includes(it) ? 'cat-' + it.id : it.id);
   const beeldSrc = it => BEELDEN.has(beeldId(it)) ? CFG.beelden + beeldId(it) + CFG.ext : null;
 
   // ---------- toestand ----------
+  // De keuzes vormen een boom: kleur ('cat') -> 'n1' -> 'n2' -> ... tot een kaartje zonder kinderen (de activiteit).
+  // Huidige versie: n1 = groep, n2 = activiteit. Nieuwe versie: bv. thuis -> binnen -> chill -> schermtijd -> tablet.
+  const MAX_DIEPTE = 8;
+  const NIVEAUS = ['cat'].concat(Array.from({ length: MAX_DIEPTE }, (_, i) => 'n' + (i + 1)));
   let modus = null;              // 'zelf' of 'voorlezen'
   let stem = null;               // 'vrouw' of 'man'
   let keuze = leeg();
   let corrigeren = false, bevestigd = false;
   const verhalen = [];
+  const isNiveau = v => NIVEAUS.includes(v);
+  const kinderen = n => n && (n.kinderen || n.groepen || n.activiteiten);
   function leeg() {
-    return { cat: null, groep: null, act: null, typ: null, wie: null, waar: null, waarweet: null, waartyp: null, wanneer: null, hoe: null };
+    const k = { typ: null, wie: null, waar: null, waarweet: null, waartyp: null, wanneer: null, hoe: null };
+    NIVEAUS.forEach(v => { k[v] = null; });
+    return k;
   }
   // wat er moet wissen als je iets anders kiest
-  const AFHANKELIJK = { cat: ['groep', 'act', 'typ'], groep: ['act', 'typ'], act: ['typ'], waar: ['waarweet', 'waartyp'], waarweet: ['waartyp'] };
-
-  function typNodig() { return (keuze.groep && keuze.groep.typ) || (keuze.act && keuze.act.typ); }
-  function metLagen() {
-    const g = keuze.groep, a = keuze.act;
-    return !(g && g.lagen === false) && !(a && a.lagen === false);
+  function afhankelijk(veld) {
+    if (isNiveau(veld)) return NIVEAUS.slice(NIVEAUS.indexOf(veld) + 1).concat('typ');
+    return { waar: ['waarweet', 'waartyp'], waarweet: ['waartyp'] }[veld] || [];
   }
+  // de gekozen kaartjes van boven naar onder
+  function pad() {
+    const p = [];
+    for (const v of NIVEAUS) { if (!keuze[v]) break; p.push(keuze[v]); }
+    return p;
+  }
+  const blad = () => { const p = pad(); return p.length > 1 ? p[p.length - 1] : null; };
+  const ergens = eigenschap => pad().some(eigenschap);
+
+  function typNodig() { return ergens(n => n.typ); }
+  function metLagen() { return !ergens(n => n.lagen === false); }
   function velden() {
-    const v = ['cat', 'groep'];
-    if (keuze.groep && keuze.groep.activiteiten) v.push('act');
+    const v = ['cat'];
+    let n = keuze.cat;
+    for (let i = 1; n && kinderen(n) && i <= MAX_DIEPTE; i++) { v.push('n' + i); n = keuze['n' + i]; }
+    if (!n) return v;                               // nog niet tot bij de activiteit
     if (typNodig()) v.push('typ');
     if (metLagen()) {
       v.push('wie');
-      if (!(keuze.act && keuze.act.waar === false)) {
+      if (!ergens(x => x.waar === false)) {
         v.push('waar');
         if (keuze.waar && keuze.waar.anders) {
           v.push('waarweet');
@@ -82,28 +111,36 @@
     if (modus === 'voorlezen' && !stem) return 'stem';
     return velden().find(v => !keuze[v]) || 'klaar';
   }
+  const ouder = stap => keuze[NIVEAUS[NIVEAUS.indexOf(stap) - 1]];
   function opties(stap) {
     switch (stap) {
       case 'start': return D.start;
       case 'stem': return D.stemmen;
       case 'cat': return D.categorieen;
-      case 'groep': return keuze.cat.groepen;
-      case 'act': return keuze.groep.activiteiten.concat(keuze.groep.ietsAnders ? [D.ietsAnders] : []);
       case 'waarweet': return D.waarweet;
-      default: return D.lagen.find(l => l.id === stap).opties;
     }
+    if (isNiveau(stap)) {
+      const o = ouder(stap);
+      return kinderen(o).concat(o.ietsAnders ? [D.ietsAnders] : []);
+    }
+    return D.lagen.find(l => l.id === stap).opties;
   }
   // id van de (voor te lezen) vraag bij een stap
   function vraagId(stap) {
-    if (stap === 'groep') return keuze.cat.vraag || 'vraag-groep';
-    if (stap === 'act') return Z['vraag-act-' + keuze.groep.id] ? 'vraag-act-' + keuze.groep.id : 'vraag-act';
+    if (stap === 'cat') return D.vraagCat || 'vraag-cat';
+    if (isNiveau(stap)) {
+      const o = ouder(stap);
+      if (Z['vraag-act-' + o.id]) return 'vraag-act-' + o.id;
+      if (o.vraag) return o.vraag;
+      return kinderen(o).some(k => kinderen(k)) ? 'vraag-groep' : 'vraag-act';
+    }
     if (stap === 'typ') return 'vraag-typ';
     return 'vraag-' + stap;
   }
   function vraagTekst(stap) {
     if (stap === 'start') return 'Hoe wil je vertellen?';
     if (stap === 'stem') return 'Welke stem?';
-    if (stap === 'cat') return D.titel;
+    if (stap === 'cat') return D.vraagCat ? Z[D.vraagCat] : D.titel;
     if (LAGEN.includes(stap)) return D.lagen.find(l => l.id === stap).vraag;
     return Z[vraagId(stap)] || '';
   }
@@ -178,14 +215,13 @@
   const stukVast = id => [id, Z[id]];
   const stukItem = (stap, it) => [stap === 'cat' ? 'cat-' + it.id : it.id, it.spreek || it.woord];
   function stukkenControle() {
-    const g = keuze.groep, a = keuze.act;
-    const blad = a || g;
-    if (!blad) return [];
-    if (blad.zin) return [['c-' + blad.id, blad.zin]];
+    const b = blad();
+    if (!b) return [];
+    if (b.zin) return [['c-' + b.id, b.zin]];
     const v = velden();
     const deel = k => (v.includes(k) && keuze[k] && keuze[k] !== '?' && keuze[k].zin) ? ['c-' + keuze[k].id, keuze[k].zin] : null;
-    const iets = (g && g.typ) || (a && a.typ);
-    const L = iets ? D.ietsAnders : a;
+    const iets = typNodig();
+    const L = iets ? D.ietsAnders : b;
     let waar = deel('waar');
     if (v.includes('waartyp') && keuze.waartyp) waar = ['', waarFrase(keuze.waartyp)];
     const uit = [stukVast('c-' + L.hww), deel('wanneer'), deel('wie'), waar];
@@ -203,8 +239,8 @@
     return hoe ? tekst + ', ' + hoe : tekst + '?';
   }
   function eindeId() {
-    if (keuze.groep && keuze.groep.einde) return keuze.groep.einde;
-    return 'einde';
+    const n = pad().reverse().find(x => x.einde);
+    return n ? n.einde : 'einde';
   }
 
   function stemKlaarzetten() {
@@ -320,7 +356,7 @@
       return;
     }
     keuze[stap] = it;
-    (AFHANKELIJK[stap] || []).forEach(k => { keuze[k] = null; });
+    afhankelijk(stap).forEach(k => { keuze[k] = null; });
     lees([stukItem(stap, it)]);
     render(true);
   }
@@ -346,7 +382,7 @@
     const idx = stap === 'klaar' ? v.length : v.indexOf(stap);
     const vorige = v[idx - 1];
     keuze[vorige] = null;
-    (AFHANKELIJK[vorige] || []).forEach(k => { keuze[k] = null; });
+    afhankelijk(vorige).forEach(k => { keuze[k] = null; });
     corrigeren = false;
     render(true);
   }
@@ -356,7 +392,7 @@
     if (veld === 'start') keuze = leeg();
     else {
       keuze[veld] = null;
-      (AFHANKELIJK[veld] || []).forEach(k => { keuze[k] = null; });
+      afhankelijk(veld).forEach(k => { keuze[k] = null; });
     }
     corrigeren = false;
     render(true);
@@ -371,25 +407,29 @@
     if (ICOON[it.id]) return svgIcoon(ICOON[it.id], 'ico');
     return klein ? '' : '<span class="plaats">beeld volgt</span>';
   }
+  const isWit = c => !!c && /^#f{6}$/i.test(c.kleur);   // de witte kleur ("nog iets anders", "ik wil niks vertellen")
   function tinten(stap) {
     if (stap === 'cat') return i => D.categorieen[i].kleur;
     if (stap === 'start' || stap === 'stem') return i => ['#ff8a45', '#8fb6d3'][i % 2];      // oranje en blauw van het thema
     const c = keuze.cat;
     let paar;
-    if (c.id === 'anders') paar = ['#f4f2ed', '#e7e3da'];
-    else if (stap === 'groep') paar = [meng(c.kleur, 0.0), meng(c.kleur, 0.2)];
-    else if (stap === 'act' || stap === 'waarweet') paar = [meng(c.kleur, 0.25), meng(c.kleur, 0.42)];
+    if (isWit(c)) paar = ['#f4f2ed', '#e7e3da'];
+    else if (stap === 'n1') paar = [meng(c.kleur, 0.0), meng(c.kleur, 0.2)];
+    else if (isNiveau(stap) || stap === 'waarweet') {
+      const d = Math.min(NIVEAUS.indexOf(stap) - 2, 2) * 0.06;                                  // dieper = iets lichter
+      paar = [meng(c.kleur, 0.25 + d), meng(c.kleur, 0.42 + d)];
+    }
     else paar = [meng(c.kleur, 0.55), meng(c.kleur, 0.70)];
     return i => paar[i % 2];
   }
   function kaartjesHTML(stap, items) {
     const tint = tinten(stap);
-    const licht = keuze.cat && keuze.cat.id === 'anders' && stap !== 'cat' && stap !== 'start' && stap !== 'stem';
+    const licht = isWit(keuze.cat) && stap !== 'cat' && stap !== 'start' && stap !== 'stem';
     const klas = { start: 'kaarten-twee', stem: 'kaarten-twee', cat: 'kaarten-cat' }[stap] || '';
     return `<div class="kaarten ${klas}" data-n="${items.length}">` +
       items.map((it, i) => {
         const kleur = tint(i);
-        const ditLicht = licht || (stap === 'cat' && it.id === 'anders');
+        const ditLicht = licht || (stap === 'cat' && isWit(it));
         const vorm = beeldSrc(it) || !ICOON[it.id] ? CFG.vorm : 'picto';
         return `<button class="kaart ${stap === 'cat' ? 'kaart-cat' : ''} ${ditLicht ? 'licht' : ''}"
             data-i="${i}" style="--k:${kleur}" aria-label="${esc(it.woord)}">
@@ -427,7 +467,7 @@
       const isCat = g.veld === 'cat';
       const beeld = g.typ ? svgIcoon(ICOON.potlood, 'ico') : (isCat && !beeldSrc(g.it) ? '' : beeldHTML(g.it));
       return (j ? `<span class="schakel">${svgIcoon(ICOON.pijl)}</span>` : '') +
-        `<button class="mini ${isCat ? 'mini-cat' : ''} ${keuze.cat.id === 'anders' ? 'licht' : ''}" data-veld="${g.veld}" style="--k:${kleur}">
+        `<button class="mini ${isCat ? 'mini-cat' : ''} ${isWit(keuze.cat) ? 'licht' : ''}" data-veld="${g.veld}" style="--k:${kleur}">
           <span class="mini-beeld">${beeld}</span>
           <span class="mini-woord">${esc(g.woord)}</span>
         </button>`;
@@ -485,7 +525,7 @@
         setTimeout(() => {
           render(false);
           lees([stukVast(eindeId())], true);
-          const stil = (keuze.groep && keuze.groep.einde) || (keuze.hoe && keuze.hoe.id === 'hoe-niet');
+          const stil = ergens(n => n.einde) || (keuze.hoe && keuze.hoe.id === 'hoe-niet');
           if (!stil) feest(D['confetti-einde']);
         }, 700);
       } else if (id === 'blok-nee') {
@@ -609,6 +649,26 @@
   $('#opnieuw').innerHTML = svgIcoon(ICOON.opnieuw);
   $('#opnieuw').addEventListener('click', helemaalOpnieuw);
   $('#overslaan').addEventListener('click', () => { stil(); keuze[huidigeStap()] = '?'; render(true); });
+  // ---------- instellingen (tandwiel): nieuwe indeling aan/uit, wordt onthouden ----------
+  const instKnop = $('#instellingen'), instPaneel = $('#instPaneel'), nieuwSchakel = $('#nieuwSchakel');
+  if (instKnop && instPaneel && NIEUW) {
+    instKnop.innerHTML = svgIcoon(ICOON.tandwiel);
+    nieuwSchakel.checked = nieuweVersie;
+    const zet = open => { instPaneel.hidden = !open; instKnop.setAttribute('aria-expanded', open); };
+    instKnop.addEventListener('click', e => { e.stopPropagation(); zet(instPaneel.hidden); });
+    document.addEventListener('click', e => { if (!instPaneel.hidden && !e.target.closest('#instPaneel')) zet(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') zet(false); });
+    nieuwSchakel.addEventListener('change', () => {
+      nieuweVersie = nieuwSchakel.checked;
+      opslag.set('nieuw', nieuweVersie);
+      laadInhoud();
+      // modus en stem blijven, het verhaal begint opnieuw
+      stil(); keuze = leeg(); bevestigd = false; corrigeren = false; verhalen.length = 0;
+      $('#blok').innerHTML = blokHTML();
+      render(false);
+    });
+  } else if (instKnop) instKnop.hidden = true;
+
   const confKnop = $('#confetti');
   confKnop.innerHTML = svgIcoon(ICOON.sparkel);
   confKnop.setAttribute('aria-pressed', confettiAan);

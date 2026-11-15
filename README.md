@@ -19,11 +19,27 @@ Onderaan staan altijd **ja · nee · weet ik niet · nog eens**. Rechtsboven: he
 
 Er is geen database, geen login en er wordt niets bewaard of doorgestuurd.
 
+## Nieuwe indeling (aan/uit)
+
+Via het **tandwiel** rechtsboven schakel je de **nieuwe indeling** aan of uit (feedback van de collega's).
+De keuze wordt onthouden op het toestel (localStorage); uit = de huidige versie hierboven.
+
+1. Startscherm en stemkeuze blijven hetzelfde.
+2. **Waar was je in het weekend?** thuis (oranje) · in de leefgroep (lichtblauw) · niet thuis (geel) · ik wil niks vertellen (wit).
+3. Thuis en leefgroep: **binnen / buiten**, daarna groepen en subgroepen (bv. binnen → chill → schermtijd → tablet).
+   Niet thuis: sporten · spelen · uitstap · gezellig bezig · chill. Niks vertellen: weet het niet meer · vergeten · echt nog iets anders · wil het niet vertellen.
+4. Met wie (+ opvoeders, vrienden van de leefgroep) → Waar (thuis binnen, thuis buiten, … de leefgroep, de jeugdbeweging) → Wanneer (+ in de vakantie) → Hoe.
+
+De inhoud staat in `inhoud-nieuw.js` (uitleg bovenaan dat bestand). Die vervangt de kleuren en lagen van `inhoud.js`;
+de rest (start, stemmen, zinnen, ja/nee-balk) wordt gedeeld. `maak_audio.py` en `maak_sclera.py` lezen beide bestanden.
+In `beta/` (prenten) hebben enkele nieuwe kaartjes nog geen prent ("beeld volgt").
+
 ## Bestanden
 
 | bestand | wat |
 |---|---|
 | `index.html`, `stijl.css`, `app.js` | de app |
+| `inhoud-nieuw.js` | de nieuwe indeling (aan/uit via het tandwiel) |
 | `inhoud.js` | **alle inhoud**: kleuren, groepen, activiteiten, lagen, zinnen, beeldbeschrijvingen, confetti. Uitleg bovenaan het bestand. |
 | `beelden/` | lichte webversies van de prenten + `lijst.js` |
 | `audio/vrouw/`, `audio/man/` | voorleesbestanden + `audio/lijst.js` |

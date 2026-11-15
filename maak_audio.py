@@ -11,6 +11,7 @@ Gebruik (in de map STYRKA_WEEKENDPRAATJE):
 
 Resultaat: audio/vrouw/<id>.mp3, audio/man/<id>.mp3 en audio/lijst.js.
 Nodig: piper (https://github.com/rhasspy/piper) en ffmpeg.
+Leest inhoud.js en inhoud-nieuw.js (de nieuwe indeling).
 De stemmodellen worden gezocht in ../TONEEL GPS STEMMETJES/ (of geef --map PAD op).
 Wat een leerling zelf typt, kan niet vooraf opgenomen worden: dat leest de stem van het toestel voor.
 """
@@ -26,9 +27,20 @@ MODELLEN = {"vrouw": "nl_BE-nathalie-medium.onnx", "man": "nl_BE-rdh-medium.onnx
 UITSPRAAK = {"tv": "teevee", "hockey": "hokkie"}
 
 
-def lees_inhoud():
-    t = (BASIS / "inhoud.js").read_text(encoding="utf-8")
+def lees_js(naam):
+    t = (BASIS / naam).read_text(encoding="utf-8")
     return json.loads(t[t.index("{"): t.rindex("}") + 1])
+
+
+def lees_inhoud():
+    """inhoud.js, met de nieuwe indeling (inhoud-nieuw.js) erbij: beide versies hebben hun voorleesbestanden nodig."""
+    d = lees_js("inhoud.js")
+    if (BASIS / "inhoud-nieuw.js").exists():
+        n = lees_js("inhoud-nieuw.js")
+        d["categorieen"] = d["categorieen"] + n.get("categorieen", [])
+        d["lagen"] = d["lagen"] + n.get("lagen", [])
+        d["zinnen"] = dict(d["zinnen"], **n.get("zinnen", {}))
+    return d
 
 
 def zinnen(d, stem):
@@ -46,17 +58,17 @@ def zinnen(d, stem):
     for s in d["stemmen"]:
         if s["stem"] == stem:
             item(s)
+    def boom(n):
+        # groepen/activiteiten (inhoud.js) of kinderen (inhoud-nieuw.js), zo diep als nodig
+        for k in n.get("kinderen") or n.get("groepen") or n.get("activiteiten") or []:
+            item(k)
+            controle = k.get("zin") or k.get("rest")
+            if controle:
+                uit.append(("c-" + k["id"], controle))
+            boom(k)
     for c in d["categorieen"]:
         item(c, "cat-" + c["id"])
-        for g in c["groepen"]:
-            item(g)
-            if g.get("zin"):
-                uit.append(("c-" + g["id"], g["zin"]))
-            for a in g.get("activiteiten", []):
-                item(a)
-                controle = a.get("zin") or a.get("rest")
-                if controle:
-                    uit.append(("c-" + a["id"], controle))
+        boom(c)
     item(d["ietsAnders"])
     for laag in d["lagen"]:
         for o in laag["opties"]:
@@ -66,10 +78,12 @@ def zinnen(d, stem):
     for o in d["waarweet"] + d["blok"]:
         item(o)
     uit += list(d["zinnen"].items())
-    gezien, uniek = set(), []
+    gezien, uniek = {}, []
     for i, z in uit:
         if i not in gezien:
-            gezien.add(i); uniek.append((i, z))
+            gezien[i] = z; uniek.append((i, z))
+        elif gezien[i] != z:
+            sys.exit(f"Zelfde id met een andere zin: {i}\n  \"{gezien[i]}\"\n  \"{z}\"\nGeef een van beide een eigen id.")
     return uniek
 
 
